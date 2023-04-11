@@ -1,0 +1,20 @@
+{
+  "_vendor-13c4a80a.js": {
+    "file": "assets/vendor-13c4a80a.js"
+  },
+  "main.css": {
+    "file": "assets/main-8a423675.css",
+    "src": "main.css"
+  },
+  "main.ts": {
+    "css": [
+      "assets/main-8a423675.css"
+    ],
+    "file": "assets/main-2c81f8f2.js",
+    "imports": [
+      "_vendor-13c4a80a.js"
+    ],
+    "isEntry": true,
+    "src": "main.ts"
+  }
+}
