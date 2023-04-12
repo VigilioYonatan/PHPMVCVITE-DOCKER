@@ -12,7 +12,11 @@ export default defineConfig({
     ],
     root: "resources",
     base: "/",
-    resolve: { alias: { "~": path.resolve(__dirname, "resources", "ts") } },
+    resolve: {
+        alias: {
+            "~": path.resolve(__dirname, "resources", "ts"),
+        },
+    },
     build: {
         outDir: path.resolve(__dirname, "public", "dist"),
         emptyOutDir: true,

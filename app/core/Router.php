@@ -2,48 +2,53 @@
 namespace App\Core;
 class Router
 {
-    public array $getRoutes = [];
-    public array $postRoutes = [];
 
-    public function get($url, $fn)
-    {
-        $this->getRoutes[$url] = $fn;
-    }
+    /*"GET" => ["contact" => fn() => ,...   ],"POST"=> */
+    private static $routes = [
+    ];
 
-    public function post($url, $fn)
+    public static function get($uri, $callback)
     {
-        $this->postRoutes[$url] = $fn;
+        $uri = trim($uri,"/");
+        self::$routes["GET"][$uri] = $callback;
     }
-
-    public function comprobarRutas()
+    public static function post($uri, $callback)
     {
-        $currentUrl = $_SERVER['PATH_INFO'] ?? '/';
-        $method     =  $_SERVER['REQUEST_METHOD'];
-        if ($method === 'GET') {
-            $fn = $this->getRoutes[$currentUrl] ?? null;
-        } else {
-            $fn = $this->postRoutes[$currentUrl] ?? null;
-        }
-        if ($fn) {
-            // Call user fn va a llamar una función cuando no sabemos cual sera
-            call_user_func($fn, $this); // This es para pasar argumentos
-        } else {
-            echo "Página No Encontrada o Ruta no válida";
-        }
+        $uri = trim($uri,"/");
+        self::$routes["POST"][$uri] = $callback;
     }
-    
-    public function render( $view, $datos = [])
-    {
-        // Leer lo que le pasamos  a la vista
-        foreach ($datos as $key => $value) {
-            $$key = $value;  // Doble signo de dolar significa: variable variable, básicamente nuestra variable sigue siendo la original, pero al asignarla a otra no la reescribe, mantiene su valor, de esta forma el nombre de la variable se asigna dinamicamente
+    public static function dispatch(){
+        
+        $uri = $_SERVER["REQUEST_URI"];
+        $uri = trim($uri,"/");
+        $method=$_SERVER["REQUEST_METHOD"];
+        foreach (self::$routes[$method] as $route => $callback) {
+            if(strpos($route,":")){
+                $route = preg_replace("#:[a-zA-Z1-9]+#","([a-zA-Z1-9]+)",$route);
+            }
+            //#^hola$# -> hola true, holaaa false,sshola false
+            if(preg_match("#^$route$#",$uri,$matches)){
+                
+                $params = array_slice($matches,1);
+                
+                if(is_callable($callback)){
+                    $response= $callback(...$params);
+                }
+                if(is_array($callback)){
+                    $controller = new $callback[0];
+                    $response   = $controller->{$callback[1]}(...$params);
+                }
+               
+                if(is_array($response) || is_object($response)){
+                    header("Content-Type: application/json");
+                    echo json_encode($response);
+                }else{
+                    echo $response;
+                }
+                return;
+            }
+      
         }
-        ob_start(); // Almacenamiento en memoria durante un momento...
-        // entonces incluimos la vista en el layout
-        // $contenido = ob_get_clean(); // Limpia el Buffer
-        // echo ob_get_clean();
-        include_once __DIR__ . "/../../resources/views/$view.php";
-        $contenido = ob_get_clean();
-        include_once __DIR__ . '/../../resources/views/layout.php';
+        echo "404";
     }
 }

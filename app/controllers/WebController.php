@@ -2,13 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Core\Router;
-use App\Models\UsuarioModel;
+use App\Core\Controller;
 
-class WebController
+
+class WebController extends Controller
 {
-    public static function home(Router $router){
-        $users = UsuarioModel::all();
-        $router->render("web/home",["users"=>$users]);
+    public function index(){
+      return $this->render("web.home",[]);
     }
 }

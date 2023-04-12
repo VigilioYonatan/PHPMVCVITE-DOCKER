@@ -1,14 +1,11 @@
-<?php require_once __DIR__ . "/../layouts/webLayout.php"; ?>
+<?php  require_once __DIR__ . "/../layouts/webLayout.php"; ?>
+<h1>hola mundo</h1>
 
-<h1 class="text-red-600 font-bold">Hola mundo</h1>
-<div class="">
-    <?php foreach($users as $user): ?>
-    <div class="">
-        <p><?= $user->nombre;?></p>
-    </div>
-    <?php endforeach; ?>
+<!-- 
+<div class="" data-component="home-background-carousel">
 </div>
-<div data-component="users">
+<div class="container mx-auto">
+    <div class=""></div>
+</div> -->
 
-</div>
-<?php require_once __DIR__ . "/../layouts/webFooter.php"; ?>
+<?php  require_once __DIR__ . "/../layouts/webFooter.php"; ?>

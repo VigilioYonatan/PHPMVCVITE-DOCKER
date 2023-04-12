@@ -17,7 +17,9 @@
         "jsx": "react-jsx",
         "jsxImportSource": "preact",
         "paths": {
-            "~/*": ["./resources/ts/*"]
+            "~/*": ["./resources/ts/*"],
+            "react": ["./node_modules/preact/compat/"],
+            "react-dom": ["./node_modules/preact/compat/"]
         }
     },
     "include": ["resources"],

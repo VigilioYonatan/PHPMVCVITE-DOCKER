@@ -1,4 +1,3 @@
-<?php require_once __DIR__ . '/../../app/config/helpers.php';?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +9,7 @@
     <title><?= $title ?? 'Home'; ?></title>
 </head>
 
-<body class="contanewWorld">
+<body class=" bg-background-light">
     <?= $contenido ?>
 </body>
 

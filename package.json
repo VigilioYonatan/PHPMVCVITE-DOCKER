@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Stack PHP mvc esbuild TS REDUX",
     "scripts": {
-        "dev": "concurrently \"php -S localhost:4000\" \"vite --host\"",
+        "dev": "vite --host",
         "build": "vite build",
         "start": "php -S localhost:4000"
     },
@@ -11,10 +11,13 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@heroicons/react": "^2.0.17",
+        "@hookform/resolvers": "^3.0.1",
         "@vigilio/preact-fetching": "^1.0.21",
         "axios": "^1.1.3",
         "control-react-hook-form": "^0.1.9",
         "react-hook-form": "^7.43.9",
+        "react-responsive-carousel": "^3.2.23",
         "zod": "^3.21.4"
     },
     "devDependencies": {
