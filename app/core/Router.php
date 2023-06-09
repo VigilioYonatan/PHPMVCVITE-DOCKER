@@ -20,6 +20,7 @@ class Router
     public static function get(string $uri, $callback,string $name)
     {
         $uri = trim($uri,"/");
+        dump($uri);
         self::$routes["GET"][$uri] = [...$callback,$name];
     }
     public static function post(string $uri, $callback,string $name)
@@ -31,7 +32,7 @@ class Router
     public static function resource(string $uri, $callback,array $only=null){
         
         if($uri[-1] !== "s"){
-            die("Debe ser plural tu ruta");
+            errorMessage("Debe ser plural tu ruta");
         }
         if($uri[0] !== "/"){
             $uri = "/".$uri;

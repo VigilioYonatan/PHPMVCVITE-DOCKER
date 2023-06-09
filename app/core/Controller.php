@@ -13,16 +13,16 @@ class Controller{
         extract($params);
        
         $route=str_replace(".","/",$route);
-       
+        require_once __DIR__."/../lib/global.php";
         if(file_exists("../resources/views/$route.php")){
             ob_start();
             require_once "../resources/views/$route.php";
             $contenido=ob_get_clean();
             require_once  '../resources/views/layout.php';
-            // return $contenido;
-        }else{
-            return errorMessage("View not found: <b>{$route}</b>");
-        }
+            return;
+        }   
+        echo errorMessage("View not found: <b>{$route}</b>");
+        
         // return $route;
     }
 

@@ -1,22 +1,43 @@
 <?php
 namespace App\Core;
 
+use PDO;
+use stdClass;
 
-
-class Model extends Database{
+class Model {
   
     protected $table;
+    public Database $db;
+    public function __construct() {
+        $this->db= new Database();
+    }
  
 
     public function first(){
-        return $this->query->fetch_assoc();
+        return $this->db->query->fetch(PDO::FETCH_OBJ);
     }
 
     public function get(){
-        return $this->query->fetch_all(MYSQLI_ASSOC);
-
+      return  $this->db->query->fetchAll(PDO::FETCH_OBJ); 
     }
+  
+   
+    public function query(string $query,$data=[]){
+        if($data){
+            $stmt   =   $this->db->prepare($query);
+            foreach ($data as $key => $value) {
+                $stmt->bindParam(":{$key}",$value);
+            }
+          
+            $stmt->execute();
+            $this->db->query =$stmt;
+        }else{
+            $this->db->query= $this->db->connection->query($query);
+            
+        }
 
+        return $this;
+    }
     public function paginate(int $limit = 15){
         $page=$_GET["page"] ?? 1;
         $sql = "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->table} LIMIT ".($page - 1) * $limit.",{$limit}";
@@ -42,13 +63,13 @@ class Model extends Database{
 
     // consultas
     public function all(){
-        $sql = "SELECT * FROM {$this->table}";
+        $sql = "SELECT * FROM ".$this->table;
         return $this->query($sql)->get();
     }
 
     public function find(string|int $id){
-        $sql = "SELECT * FROM {$this->table} where id = ?";
-        return $this->query($sql,[$id],"i");
+        $sql = "SELECT * FROM {$this->table} where id = :id";
+        return $this->query($sql,["id"=>$id]);
     }
 
     public function where(string $column,string $operator, $value = null){
@@ -56,8 +77,8 @@ class Model extends Database{
             $value = $operator;
             $operator = "=";
         }
-        $sql    =   "SELECT * FROM {$this->table} where {$column} {$operator} ?";
-        $this->query($sql,[$value],"s");
+        $sql    =   "SELECT * FROM {$this->table} where {$column} {$operator} :value";
+        $this->query($sql,["value"=>$value]);
         return $this;
     }
 
@@ -65,11 +86,10 @@ class Model extends Database{
         $columns = array_keys($data);
         $columns = implode(", ",$columns);
         $values = array_values($data);
-        // $values = "'".implode("', '",$values)."'";
        
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES (".str_repeat("?, ",count($values)-1)."?)";
-        $this->query($sql,$values);
-        $insert_id =  $this->connection->insert_id; // mostrar id
+        $this->db->query($sql,$values);
+        $insert_id =  $this->db->connection->lastInsertId(); // mostrar id
         return  $this->find($insert_id)->first();
     }
 
@@ -82,14 +102,14 @@ class Model extends Database{
         $sql = "UPDATE {$this->table} set {$fields} WHERE id = ? ";
         $values = array_values($data);
         $values[]    =   $id;
-        $this->query($sql,$values);
+        $this->db->query($sql,$values);
         return $this->find($id)->first();
     }
 
     public function delete(string|int $id){
         $sql = "DELETE FROM {$this->table} WHERE id = ?";
-        $this->query($sql,[$id],"i");
-        // return $this->query;
+        $this->db->query($sql,[$id],"i");
+        // return $this->db->query;
     }
 
  

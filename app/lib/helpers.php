@@ -7,7 +7,7 @@ use App\Core\Router;
 
 function dump(mixed $var): void
 {
-    echo "<pre style='font-size:.8rem;color:white;background-color:rgba(0,0,0,0.9);border-radius:.5rem;padding:1rem;max-width:800px;max-height:600px;overflow: auto;'>";
+    echo "<pre style='font-size:.8rem;color:white;background-color:rgba(0,0,0,0.9);border-radius:.5rem;padding:1rem;max-width:800px;max-height:600px;overflow: auto;>";
     var_dump($var);
     echo "</pre>";
 }
@@ -35,14 +35,31 @@ function arrayFrom($var,int $length=20){
     return $values;
 }
 
-function route(string $uri){
+function route(string $uri,array $param=null){
     $url = null;
     foreach(Router::routers() as  $rutas){
         foreach($rutas as $key=>$ruta){
             if ($ruta[2] === $uri) {
                 $url = $key;  
+                $params= array_slice(explode("/:",$key),1);
+                if(count($params) > 0   ){
+                    if(!$param){
+                        echo errorMessage("Paramaters is required in {$uri}: parameters ".implode(", ",$params));
+                        return;
+                    }
+                    if(array_keys($param) !== $params){
+                        echo errorMessage("Paramaters incorrect: ".implode(", ",$params));
+                        return;      
+                    }
+                    foreach($params as $par){
+                        $url= str_replace(":$par",$param[$par],$url);
+                    }
+                }
                 break;
-            } 
+            }else{
+            //    echo errorMessage("no se encontró una uri con este nombre: <b>{$uri}</b>");
+               return;
+            }
         }  
     } 
     return "http://{$_SERVER['HTTP_HOST']}/$url";
@@ -80,7 +97,7 @@ function props(...$args){
 }
 
 function errorMessage($message){
-    return "<p class='text-white bg-red-600 p-4 block my-6' style='color:white;background-color:rgb(220 38 38 1);display:block;padding:1rem;margin:0rem 1.3rem;'>{$message}</b></p>";
+    return "<p  style='color:white;background-color:rgb(220,38,38,1);display:block;padding:1rem;margin:0rem 1.3rem;border-radius:0.5rem'>{$message}</p>";
 }
 
 
@@ -127,7 +144,7 @@ function settings(string $mode ="dark"){
    
     if($_ENV["MODE"] === "production") return;
     $textColor = $mode === "dark" ? "#fff" :"#000";
-  $mode = $mode === "dark" ? "rgba(0, 0, 0, 1)" :"rgba(255, 255, 255, 1)";
+    $mode = $mode === "dark" ? "rgba(0, 0, 0, 1)" :"rgba(255, 255, 255, 1)";
 
     echo "<div>
             <div
@@ -149,7 +166,6 @@ function settings(string $mode ="dark"){
 }
 
 function modal(string $mode,string $textColor){
-    global $color;
     echo "
     <div id='modal-vigilio'  style='width:600px;position:relative;position:fixed;background-color:{$mode};color:{$textColor};z-index:999999999;border-radius:.5rem;padding:2rem;bottom:120px;right:30px;overflow:auto'
     > ";

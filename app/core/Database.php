@@ -2,6 +2,7 @@
 namespace App\Core;
 
 use mysqli;
+use PDO;
 
 class Database{
        
@@ -10,35 +11,30 @@ class Database{
         protected $db_pass  =   DB_PASS;
         protected $db_name  =   DB_NAME;
 
-        protected $connection;
-        protected $query;
+        public $connection;
+        public $query;
         
         public function __construct()
         {
            $this->connection();
         }
+        public function query(string $query){
+            $this->query= $this->connection->query($query);
+    
+        }
 
         public function connection(){
-            $this->connection   =   new mysqli($this->db_host,$this->db_user,$this->db_pass,$this->db_name);
-            
-            if($this->connection->connect_error){
-                die("Error de conexión:".$this->connection->connect_error);
+            try {
+                $cnx   =  new PDO("mysql:host=$this->db_host;dbname=$this->db_name",$this->db_user,$this->db_pass);
+                $cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $this->connection =$cnx;
+            } catch (\PDOException $e) {
+                errorMessage("Connection failed: " . $e->getMessage());
+                die();
             }
+           
         }
-        public function query(string $query,$data=[],$params=null){
-            if($data){
-                if($params == null){
-                    $params = str_repeat("s",count($data));
-                }
-                $stmt   =   $this->connection->prepare($query);
-                $stmt->bind_param($params,...$data);
-                $stmt->execute();
-                $this->query =  $stmt->get_result();
-            }else{
-                $this->query= $this->connection->query($query);
-            }
-             return $this;
-        }
+       
        public function applyMigrations()
        {
            $this->createMigrationsTable();
@@ -70,7 +66,7 @@ class Database{
    
        protected function createMigrationsTable()
        {
-           $this->query("CREATE TABLE IF NOT EXISTS migrations (
+        $this->query= $this->connection->query("CREATE TABLE IF NOT EXISTS migrations (
                id INT AUTO_INCREMENT PRIMARY KEY,
                migration VARCHAR(255),
                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -79,26 +75,26 @@ class Database{
    
        protected function getAppliedMigrations()
        {
-            $this->query("SELECT migration FROM migrations");
+        $this->query("SELECT migration FROM migrations");
           
-            $migrations= $this->query->fetch_all();
+            $migrations= $this->query->fetchAll();
             return $migrations;
        }
 
        public function getMigrations(){
         $this->query("SELECT * FROM migrations");
-        $migrations= $this->query->fetch_all(MYSQLI_ASSOC);
+        $migrations= $this->query->fetchAll(PDO::FETCH_ASSOC);
         return $migrations;
        }
        public function getTables(){
-        $this->query("Show tables");
-        $results= $this->query->fetch_all(MYSQLI_ASSOC);
+        $this->query("SHOW tables");
+        $results= $this->query->fetchAll(PDO::FETCH_ASSOC);
         return $results;
        }
        public function count(string $table){
-        $this->query("SELECT COUNT(*) as count FROM $table");
-        $result= $this->query->fetch_assoc();
-        return $result;
+            $this->query("SELECT COUNT(*) as count FROM $table");
+            $result= $this->query->fetch();
+            return $result;
        }
    
        protected function saveMigrations(array $newMigrations)
