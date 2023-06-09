@@ -1,11 +1,14 @@
-<?php  require_once __DIR__ . "/../layouts/webLayout.php"; ?>
-<h1>hola mundo</h1>
+<?php $title = "HomePage" ?>
+<?php  require_once __DIR__ . "/../layouts/webHeader.php"; ?>
 
-<!-- 
-<div class="" data-component="home-background-carousel">
+<?= component("extras.titlePage",[
+    "color"=>"text-white",
+    "title"=>$title]) 
+?>
+<div class=" self-start">
+    <div class="vue-app">
+        <hello-world />
+    </div>
 </div>
-<div class="container mx-auto">
-    <div class=""></div>
-</div> -->
 
 <?php  require_once __DIR__ . "/../layouts/webFooter.php"; ?>
