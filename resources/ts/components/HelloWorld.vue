@@ -4,7 +4,7 @@ import { ref } from "vue";
 const num = ref(0);
 </script>
 <template>
-    <div class="flex justify-center items-center flex-col gap-3 mx-4">
+    <div class="flex justify-center items-center flex-col gag-3">
         <p class="text-2xl font-bold uppercase text-white">
             Hello World IN VUE
         </p>
@@ -27,7 +27,7 @@ const num = ref(0);
         <button
             class="bg-red-600 text-white px-5 rounded-md"
             type="button"
-            @click="num++"
+            @click="num--"
         >
             -
         </button>

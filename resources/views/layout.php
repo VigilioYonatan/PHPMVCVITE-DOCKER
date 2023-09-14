@@ -17,7 +17,8 @@
 
 <body class="bg-slate-900 flex flex-col items-center h-screen">
     <?= $contenido ?>
-    <?php settings("dark")?>
+
+    <?php require_once __DIR__."/../../app/config/setting.php"?>
 </body>
 
 </html>

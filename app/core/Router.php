@@ -17,16 +17,26 @@ class Router
         ];
     }
 
-    public static function get(string $uri, $callback,string $name)
+    public static function get(string $uri, $callback,string $name=null)
     {
+        
         $uri = trim($uri,"/");
-        dump($uri);
-        self::$routes["GET"][$uri] = [...$callback,$name];
+        if(is_callable($callback)){
+            self::$routes["GET"][$uri] = [$callback,"NAME"=>$name];
+            return;
+        }
+        self::$routes["GET"][$uri] = [...$callback,"NAME"=>$name];
+        
     }
-    public static function post(string $uri, $callback,string $name)
+    public static function post(string $uri, $callback,string $name=null)
     {
         $uri = trim($uri,"/");
-        self::$routes["POST"][$uri] = [...$callback,$name];
+        if(is_callable($callback)){
+            self::$routes["POST"][$uri] = [$callback,"NAME"=>$name];
+            return;
+        }
+        self::$routes["POST"][$uri] = [...$callback,"NAME"=>$name];
+
     }
 
     public static function resource(string $uri, $callback,array $only=null){
@@ -75,15 +85,17 @@ class Router
             if(preg_match("#^$route$#",$uri,$matches)){
                 
                 $params = array_slice($matches,1);
-                
-                if(is_callable($callback)){
-                    $response= $callback(...$params);
-                }
-                if(is_array($callback)){
+                if(is_callable($callback[0])){
+                    $response= $callback[0](...$params);
+                }else{
                     $controller = new $callback[0];
+                    if(!method_exists($callback[0],$callback[1])){
+                        echo errorMessage("Not found method :{$callback[0]}:{$callback[1]}");
+                        die();
+                    }
                     $response   = $controller->{$callback[1]}(...$params);
-                }
-               
+                    
+                } 
                 if(is_array($response) || is_object($response)){
                     header("Content-Type: application/json");
                     echo json_encode($response);

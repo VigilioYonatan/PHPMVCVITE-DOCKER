@@ -5,7 +5,7 @@
     "color"=>"text-white",
     "title"=>$title]) 
 ?>
-<div class=" self-start">
+<div class="">
     <div class="vue-app">
         <hello-world />
     </div>

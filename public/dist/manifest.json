@@ -1,20 +1,31 @@
 {
-  "_vendor-e9733e91.js": {
-    "file": "assets/vendor-e9733e91.js"
+  "_vendor-3ce0e8b9.js": {
+    "file": "assets/vendor-3ce0e8b9.js"
   },
   "main.css": {
-    "file": "assets/main-2383071f.css",
+    "file": "assets/main-4e7e0201.css",
     "src": "main.css"
   },
   "main.ts": {
     "css": [
-      "assets/main-2383071f.css"
+      "assets/main-4e7e0201.css"
     ],
-    "file": "assets/main-27ddf821.js",
+    "dynamicImports": [
+      "ts/components/HelloVigilio.vue"
+    ],
+    "file": "assets/main-dfa8c2fd.js",
     "imports": [
-      "_vendor-e9733e91.js"
+      "_vendor-3ce0e8b9.js"
     ],
     "isEntry": true,
     "src": "main.ts"
+  },
+  "ts/components/HelloVigilio.vue": {
+    "file": "assets/HelloVigilio-d4f8a5d6.js",
+    "imports": [
+      "_vendor-3ce0e8b9.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "ts/components/HelloVigilio.vue"
   }
 }

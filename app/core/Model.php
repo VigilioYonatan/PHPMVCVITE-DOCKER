@@ -2,14 +2,15 @@
 namespace App\Core;
 
 use PDO;
-use stdClass;
 
 class Model {
   
     protected $table;
     public Database $db;
+    public Validator $validator;
     public function __construct() {
         $this->db= new Database();
+        $this->validator= new Validator($this->db);
     }
  
 

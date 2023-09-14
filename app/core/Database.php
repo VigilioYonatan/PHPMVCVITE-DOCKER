@@ -75,10 +75,9 @@ class Database{
    
        protected function getAppliedMigrations()
        {
-        $this->query("SELECT migration FROM migrations");
-          
-            $migrations= $this->query->fetchAll();
-            return $migrations;
+            $stmt = $this->prepare("SELECT migration FROM migrations");
+            $stmt->execute();
+            return $stmt->fetchAll(\PDO::FETCH_COLUMN);
        }
 
        public function getMigrations(){
@@ -100,7 +99,7 @@ class Database{
        protected function saveMigrations(array $newMigrations)
        {
            $str = implode(',', array_map(fn($m) => "('$m')", $newMigrations));
-           $statement = $this->connection->prepare("INSERT INTO migrations (migration) VALUES 
+           $statement = $this->prepare("INSERT INTO migrations (migration) VALUES 
                $str
            ");
            $statement->execute();
