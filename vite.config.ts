@@ -2,18 +2,19 @@
 import { defineConfig, splitVendorChunkPlugin } from "vite";
 import liveReload from "vite-plugin-live-reload";
 import path from "path";
-import preact from "@preact/preset-vite";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
     plugins: [
         liveReload([path.resolve(__dirname, "resources/**/*.php")]),
         splitVendorChunkPlugin(),
-        preact({ include: path.resolve(__dirname, "resources/ts") }),
+        vue(),
     ],
     root: "resources",
     base: "/",
     resolve: {
         alias: {
+            vue: "vue/dist/vue.esm-bundler.js",
             "~": path.resolve(__dirname, "resources", "ts"),
         },
     },
@@ -36,8 +37,8 @@ export default defineConfig({
         strictPort: true,
         port: 5133,
         host: true,
-        watch: {
-            usePolling: true,
-        },
+        // watch: {
+        //     usePolling: true, // docker
+        // },
     },
 });

@@ -1,0 +1,1 @@
+<h1 class="text-3xl uppercase font-bold my-6 <?= $color ?? null ?>"><?= $title; ?></h1>

@@ -74,6 +74,7 @@ function cssTag(string $entry): string
 
     $tags = '';
     foreach (cssUrls($entry) as $url) {
+
         $tags .= '<link rel="stylesheet" href="'
             . $url
             . '">';
@@ -86,7 +87,7 @@ function cssTag(string $entry): string
 
 function getManifest(): array
 {
-    $content = file_get_contents(__DIR__ . '/../../public/dist/manifest.json');
+    $content = file_get_contents('./dist/manifest.json');
     return json_decode($content, true);
 }
 

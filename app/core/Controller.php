@@ -6,33 +6,33 @@ class Controller{
     public function __construct()
     {
         $this->setBody();
-        $this->setRequest();
+
     }
-    public function render($route,$params = []){
+    public function render(string $route,array $params = []){
         // destructar array y mostrar en las vistas las variables
         extract($params);
-        // $route=str_replace(".","/",$route);
+       
+        $route=str_replace(".","/",$route);
+        require_once __DIR__."/../lib/global.php";
         if(file_exists("../resources/views/$route.php")){
             ob_start();
             require_once "../resources/views/$route.php";
             $contenido=ob_get_clean();
             require_once  '../resources/views/layout.php';
-            // return $contenido;
-        }
+            return;
+        }   
+        echo errorMessage("View not found: <b>{$route}</b>");
+        
         // return $route;
     }
 
-    public function redirect($route){
+    public function redirect(string $route):void{
         header("Location: {$route}");
     }
-    public function setRequest(){
-        $this->request= $_SERVER['REQUEST_METHOD'];
-    }
-
-    public function statusCode($num = 200){
+    public function statusCode(int $num = 200):void{
         http_response_code($num);
     }
-    public function setBody(){
+    public function setBody():void{
         $this->body = json_decode(file_get_contents('php://input'), true);
     }
 }

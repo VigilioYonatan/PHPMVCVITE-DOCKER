@@ -3,24 +3,79 @@ namespace App\Core;
 class Router
 {
 
-    /*"GET" => ["contact" => fn() => ,...   ],"POST"=> */
-    private static $routes = [
-    ];
+    private static array $routes=[];
 
-    public static function get($uri, $callback)
-    {
-        $uri = trim($uri,"/");
-        self::$routes["GET"][$uri] = $callback;
+    private static function routesResources (string $uri,string $param) {
+        return [
+            "index"=>["method"=>"GET","uri"=>$uri], //index
+            "store"=>["method"=>"POST","uri"=>$uri], //index
+            "create"=>["method"=>"GET","uri"=>"{$uri}/create"], //create
+            "show"=>["method"=>"GET","uri"=>"{$uri}/:{$param}"], //show
+            "edit"=>["method"=>"GET","uri"=>"{$uri}/:{$param}/edit"], //edit
+            "update"=>["method"=>"POST","uri"=>"{$uri}/:{$param}"], //update
+            "destroy"=>["method"=>"POST","uri"=>"{$uri}/:{$param}/delete"], //destroy
+        ];
     }
-    public static function post($uri, $callback)
+
+    public static function get(string $uri, $callback,string $name=null)
     {
-        $uri = trim($uri,"/");
-        self::$routes["POST"][$uri] = $callback;
-    }
-    public static function dispatch(){
         
+        $uri = trim($uri,"/");
+        if(is_callable($callback)){
+            self::$routes["GET"][$uri] = [$callback,"NAME"=>$name];
+            return;
+        }
+        self::$routes["GET"][$uri] = [...$callback,"NAME"=>$name];
+        
+    }
+    public static function post(string $uri, $callback,string $name=null)
+    {
+        $uri = trim($uri,"/");
+        if(is_callable($callback)){
+            self::$routes["POST"][$uri] = [$callback,"NAME"=>$name];
+            return;
+        }
+        self::$routes["POST"][$uri] = [...$callback,"NAME"=>$name];
+
+    }
+
+    public static function resource(string $uri, $callback,array $only=null){
+        
+        if($uri[-1] !== "s"){
+            errorMessage("Debe ser plural tu ruta");
+        }
+        if($uri[0] !== "/"){
+            $uri = "/".$uri;
+        }
+        
+       
+        $param =strpos($uri,"/api") !==false  ? substr($uri,5,-1)  :substr($uri,1,-1);
+       
+        if($only){
+            foreach($only as $path){
+                $pathOnly =self::routesResources($uri,$param)[$path];
+                self::{$pathOnly["method"]}($pathOnly["uri"],[$callback,$path],substr($uri,1).".".$path);
+            }
+            return;
+        }
+
+        $paths = self::routesResources($uri,$param) ;
+        foreach($paths as  $key=>$path){
+            self::{$path["method"]}($path["uri"],[$callback,$key],substr($uri,1).".".$key);
+       }
+    }
+    public static function apiResource(string $uri, $callback,array $only=["index","store","show","update","destroy"]){
+        $apiUri="/api{$uri}";
+        self::resource($apiUri,$callback, $only);
+    }
+ 
+    public static function dispatch(){
         $uri = $_SERVER["REQUEST_URI"];
         $uri = trim($uri,"/");
+        if(strpos($uri,"?")){
+            $uri = substr($uri,0,strpos($uri,"?"));
+        }   
+      
         $method=$_SERVER["REQUEST_METHOD"];
         foreach (self::$routes[$method] as $route => $callback) {
             if(strpos($route,":")){
@@ -30,15 +85,17 @@ class Router
             if(preg_match("#^$route$#",$uri,$matches)){
                 
                 $params = array_slice($matches,1);
-                
-                if(is_callable($callback)){
-                    $response= $callback(...$params);
-                }
-                if(is_array($callback)){
+                if(is_callable($callback[0])){
+                    $response= $callback[0](...$params);
+                }else{
                     $controller = new $callback[0];
+                    if(!method_exists($callback[0],$callback[1])){
+                        echo errorMessage("Not found method :{$callback[0]}:{$callback[1]}");
+                        die();
+                    }
                     $response   = $controller->{$callback[1]}(...$params);
-                }
-               
+                    
+                } 
                 if(is_array($response) || is_object($response)){
                     header("Content-Type: application/json");
                     echo json_encode($response);
@@ -49,6 +106,11 @@ class Router
             }
       
         }
+        http_response_code(404);
         echo "404";
+    }
+
+    public static function routers(){
+        return self::$routes;
     }
 }
