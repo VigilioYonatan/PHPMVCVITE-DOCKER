@@ -1,31 +1,38 @@
 {
-  "_vendor-3ce0e8b9.js": {
-    "file": "assets/vendor-3ce0e8b9.js"
+  "_vendor-3b3f7e48.js": {
+    "file": "assets/vendor-3b3f7e48.js"
   },
   "main.css": {
-    "file": "assets/main-4e7e0201.css",
+    "file": "assets/main-9db6fbdd.css",
     "src": "main.css"
   },
   "main.ts": {
     "css": [
-      "assets/main-4e7e0201.css"
+      "assets/main-9db6fbdd.css"
     ],
     "dynamicImports": [
-      "ts/components/HelloVigilio.vue"
+      "ts/components/CarouselHome.vue"
     ],
-    "file": "assets/main-dfa8c2fd.js",
+    "file": "assets/main-21b660a9.js",
     "imports": [
-      "_vendor-3ce0e8b9.js"
+      "_vendor-3b3f7e48.js"
     ],
     "isEntry": true,
     "src": "main.ts"
   },
-  "ts/components/HelloVigilio.vue": {
-    "file": "assets/HelloVigilio-d4f8a5d6.js",
+  "ts/components/CarouselHome.css": {
+    "file": "assets/CarouselHome-f48f1ad4.css",
+    "src": "ts/components/CarouselHome.css"
+  },
+  "ts/components/CarouselHome.vue": {
+    "css": [
+      "assets/CarouselHome-f48f1ad4.css"
+    ],
+    "file": "assets/CarouselHome-c6f2b0b5.js",
     "imports": [
-      "_vendor-3ce0e8b9.js"
+      "_vendor-3b3f7e48.js"
     ],
     "isDynamicEntry": true,
-    "src": "ts/components/HelloVigilio.vue"
+    "src": "ts/components/CarouselHome.vue"
   }
 }

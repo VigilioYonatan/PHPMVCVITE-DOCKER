@@ -1,1 +1,0 @@
-import{o as r,c as l}from"./vendor-3ce0e8b9.js";const s=(o,e)=>{const t=o.__vccOpts||o;for(const[c,n]of e)t[c]=n;return t},a={};function _(o,e){return r(),l("h2",null,"Hola vigilio")}const f=s(a,[["render",_]]);export{f as default};

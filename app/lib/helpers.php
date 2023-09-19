@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Router;
+use App\Core\Sessiones;
 
 function dump(mixed $var): void
 {
@@ -42,26 +43,22 @@ function route(string $uri,array $param=null){
         foreach($rutas as $key=>$ruta){
             if ($ruta["NAME"] === $uri) {
                 $url = $key;  
-                $params= array_slice(explode("/:",$key),1);
-                if(count($params) > 0){
-                    if(!$param){
-                        echo errorMessage("Paramaters is required in {$uri}: parameters ".implode(", ",$params));
-                        return;
-                    }
-                    if(array_keys($param) !== $params){
-                        echo errorMessage("Paramaters incorrect: ".implode(", ",$params));
-                        return;      
-                    }
-                    foreach($params as $par){
-                        $url= str_replace(":$par",$param[$par],$url);
+                if( $param) {     
+                    foreach ($param as $key => $value) {
+                        if (in_array($key, array_keys($param))) {
+                            $url = str_replace(":$key",$value,$url);
+                        } else {
+                            dump("falta un paramatro: {$key}");
+                        } 
                     }
                 }
-                break;
+
             }
         }  
     } 
     return "http://{$_SERVER['HTTP_HOST']}/$url";
 }
+
 function component(string $route,array $props =[]){
     extract($props);
     $route=str_replace(".","/",$route);
@@ -72,7 +69,7 @@ function component(string $route,array $props =[]){
         $contenido =ob_get_clean();
        return $contenido;
     }
-    return errorMessage("Component not found: <b>{$route}</b>");
+     dd("Component not found: <b>{$route}</b>");
 }
 
 
@@ -92,4 +89,32 @@ function props(...$args){
             }
         }     
     }
+}
+
+function csrf_token(){
+    if (!isset($_SESSION[Sessiones::CSRF_TOKEN])) {
+        $_SESSION[Sessiones::CSRF_TOKEN] = bin2hex(random_bytes(32)); // Genera un token aleatorio
+    }
+    $csrf_token = $_SESSION[Sessiones::CSRF_TOKEN];
+    $name=Sessiones::CSRF_TOKEN;
+    return "<input type='hidden' name={$name} value={$csrf_token} >";
+}
+function error(string $key ){
+    if ($_SESSION &&  isset($_SESSION[Sessiones::ERRORS]) && isset(Sessiones::get(Sessiones::ERRORS)[$key])) {
+        $error=$_SESSION[Sessiones::ERRORS][$key];
+        return array_shift($error[0]);
+    }
+}
+function old(string $key ){
+    if ($_SESSION &&  isset($_SESSION[Sessiones::OLD]) && isset(Sessiones::get(Sessiones::OLD)[$key])) {
+        return Sessiones::get(Sessiones::OLD)[$key];
+    }
+}
+
+function session(string $key){
+    $value = null;
+    if(isset($_SESSION[Sessiones::CUSTOM]) && isset($_SESSION[Sessiones::CUSTOM][$key])){
+        $value =$_SESSION[Sessiones::CUSTOM][$key];
+    }
+    return $value;
 }

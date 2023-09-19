@@ -1,3 +1,11 @@
 @tailwind base;
-@tailwind components;
 @tailwind utilities;
+@tailwind components;
+@import "./fontawesome.min.css";
+@import "./brands.min.css";
+@import "./regular.min.css";
+@import "./solid.min.css";
+
+.delay-custom-1 {
+    transition: all 0.3s ease;
+}

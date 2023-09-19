@@ -6,11 +6,17 @@ use PDO;
 class Model {
   
     protected $table;
+    protected $fillable;
+    protected $created_at = "created_at";
+    protected $updated_at = "updated_at";
+    
     public Database $db;
-    public Validator $validator;
+    public Validators $validator;
+
     public function __construct() {
         $this->db= new Database();
-        $this->validator= new Validator($this->db);
+        $this->validator = new Validators();
+        // $this->validator= new Validator($this->db);
     }
  
 
@@ -24,13 +30,13 @@ class Model {
   
    
     public function query(string $query,$data=[]){
+ 
         if($data){
             $stmt   =   $this->db->prepare($query);
             foreach ($data as $key => $value) {
-                $stmt->bindParam(":{$key}",$value);
+                $stmt->bindValue(":{$key}",$value);
             }
-          
-            $stmt->execute();
+            $stmt->execute($data);
             $this->db->query =$stmt;
         }else{
             $this->db->query= $this->db->connection->query($query);
@@ -72,6 +78,10 @@ class Model {
         $sql = "SELECT * FROM {$this->table} where id = :id";
         return $this->query($sql,["id"=>$id]);
     }
+    public function findByPK(string|int $id){
+        $sql = "SELECT * FROM {$this->table} where id = :id LIMIT 1";
+        return $this->query($sql,["id"=>$id])->first();
+    }
 
     public function where(string $column,string $operator, $value = null){
         if($value == null){
@@ -84,26 +94,39 @@ class Model {
     }
 
     public function create(array $data){
+        if($this->fillable){
+            $data = array_intersect_key($data, array_flip($this->fillable));
+        }
+        if($this->created_at){
+            $data[$this->created_at]=date('Y-m-d H:i:s');
+        }
+        if($this->updated_at){
+            $data[$this->updated_at]=date('Y-m-d H:i:s');  
+        }
+
         $columns = array_keys($data);
+        $values = implode(", :",$columns);
         $columns = implode(", ",$columns);
-        $values = array_values($data);
-       
-        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES (".str_repeat("?, ",count($values)-1)."?)";
-        $this->db->query($sql,$values);
+      
+        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES (:{$values})";
+        $this->query($sql,$data);
         $insert_id =  $this->db->connection->lastInsertId(); // mostrar id
         return  $this->find($insert_id)->first();
     }
 
     public function update(string|int $id,array $data){
+      
+        if($this->updated_at){
+            $data[$this->updated_at]=date('Y-m-d H:i:s');  
+        }
         $fields = [];
         foreach($data as $key=>$value){
-                $fields[] = "{$key} = ?";
+                $fields[] = "{$key} = :$key";
         }
         $fields= implode(", ", $fields);
-        $sql = "UPDATE {$this->table} set {$fields} WHERE id = ? ";
-        $values = array_values($data);
-        $values[]    =   $id;
-        $this->db->query($sql,$values);
+        $sql = "UPDATE {$this->table} set {$fields} WHERE id = :id ";
+        $data["id"]    =   $id;
+        $this->query($sql,$data);
         return $this->find($id)->first();
     }
 

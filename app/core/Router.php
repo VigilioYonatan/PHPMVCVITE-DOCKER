@@ -42,7 +42,7 @@ class Router
     public static function resource(string $uri, $callback,array $only=null){
         
         if($uri[-1] !== "s"){
-            errorMessage("Debe ser plural tu ruta");
+            dd("Debe ser plural tu ruta");
         }
         if($uri[0] !== "/"){
             $uri = "/".$uri;
@@ -70,6 +70,7 @@ class Router
     }
  
     public static function dispatch(){
+        session_start();
         $uri = $_SERVER["REQUEST_URI"];
         $uri = trim($uri,"/");
         if(strpos($uri,"?")){
@@ -79,35 +80,34 @@ class Router
         $method=$_SERVER["REQUEST_METHOD"];
         foreach (self::$routes[$method] as $route => $callback) {
             if(strpos($route,":")){
-                $route = preg_replace("#:[a-zA-Z1-9]+#","([a-zA-Z1-9]+)",$route);
+                $route = preg_replace("#:\w+#","([\w]+)",$route);
             }
             //#^hola$# -> hola true, holaaa false,sshola false
             if(preg_match("#^$route$#",$uri,$matches)){
-                
+                Controller::csrf();
+                Controller::old();
                 $params = array_slice($matches,1);
                 if(is_callable($callback[0])){
                     $response= $callback[0](...$params);
                 }else{
                     $controller = new $callback[0];
                     if(!method_exists($callback[0],$callback[1])){
-                        echo errorMessage("Not found method :{$callback[0]}:{$callback[1]}");
-                        die();
+                         dd("Not found method :{$callback[0]}:{$callback[1]}, please create a method");
                     }
                     $response   = $controller->{$callback[1]}(...$params);
-                    
+                 
                 } 
                 if(is_array($response) || is_object($response)){
                     header("Content-Type: application/json");
                     echo json_encode($response);
                 }else{
                     echo $response;
-                }
+                }                
                 return;
             }
-      
         }
-        http_response_code(404);
-        echo "404";
+       
+        Controller::page404();
     }
 
     public static function routers(){

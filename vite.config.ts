@@ -11,7 +11,7 @@ export default defineConfig({
         vue(),
     ],
     root: "resources",
-    base: "/",
+    base: "/dist",
     resolve: {
         alias: {
             vue: "vue/dist/vue.esm-bundler.js",
@@ -37,8 +37,8 @@ export default defineConfig({
         strictPort: true,
         port: 5133,
         host: true,
-        // watch: {
-        //     usePolling: true, // docker
-        // },
+        watch: {
+            usePolling: true, // docker
+        },
     },
 });

@@ -138,6 +138,7 @@ use App\Core\Router;
         border-radius: 1rem;
         color: white;
         font-weight: bold;
+        z-index: 999999;
     }
 
     .modal-vigilio {

@@ -20,7 +20,6 @@ class Database{
         }
         public function query(string $query){
             $this->query= $this->connection->query($query);
-    
         }
 
         public function connection(){
@@ -29,7 +28,7 @@ class Database{
                 $cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->connection =$cnx;
             } catch (\PDOException $e) {
-                errorMessage("Connection failed: " . $e->getMessage());
+                dd("Connection failed: " . $e->getMessage());
                 die();
             }
            
